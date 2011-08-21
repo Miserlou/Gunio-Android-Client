@@ -1,6 +1,8 @@
 package io.gun.gunbot;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.widget.ImageButton;
 
 public class MainMenuActivity extends Activity {
 	
+	Context c;
 	
 	ImageButton careers;
 	ImageButton contracts;
@@ -25,6 +28,8 @@ public class MainMenuActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
         
+        c = this;
+        
         careers = (ImageButton)findViewById(R.id.careers);
         contracts = (ImageButton)findViewById(R.id.contracts);
         opensource = (ImageButton)findViewById(R.id.opensource);
@@ -35,6 +40,10 @@ public class MainMenuActivity extends Activity {
 				careers.setImageResource(R.drawable.careersblur);
 				contracts.setImageResource(R.drawable.contracts);
 				opensource.setImageResource(R.drawable.opensource);
+				
+                Intent i = new Intent(c, CareersListViewActivity.class);
+                startActivity(i);
+                
 			}});
         contracts.setOnClickListener(new OnClickListener(){
 			@Override
