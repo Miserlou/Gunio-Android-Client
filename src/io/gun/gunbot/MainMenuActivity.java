@@ -51,6 +51,9 @@ public class MainMenuActivity extends Activity {
 				contracts.setImageResource(R.drawable.contractsblur);
 				careers.setImageResource(R.drawable.careers);
 				opensource.setImageResource(R.drawable.opensource);
+				
+                Intent i = new Intent(c, FreelanceListViewActivity.class);
+                startActivity(i);
 			}});
         opensource.setOnClickListener(new OnClickListener(){
 			@Override

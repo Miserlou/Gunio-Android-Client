@@ -1,6 +1,7 @@
 package io.gun.gunbot;
 
 import io.gun.gunbot.Careers.Career;
+import io.gun.gunbot.Contracts.Contract;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,18 +23,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class CareersListViewActivity extends Activity{
+public class FreelanceListViewActivity extends Activity{
     
-    CareersArrayListAdapter adapter;
+    ContractsArrayListAdapter adapter;
     ListView lv;
     ArrayList<ArrayList<HashMap<String, String>>> mal;
     Context c;
     String u;
     ImageView headerButton;
     Animation rotate;
-    GetCareersDataTask getDataTask;
+    GetContractsDataTask getDataTask;
     
-    String careersURL = "http://gun.io/secretapi/v1/careers/?format=json";
+    String careersURL = "http://gun.io/secretapi/v1/contracts/?format=json";
     
     View lastTouched;
     
@@ -45,52 +46,41 @@ public class CareersListViewActivity extends Activity{
         setContentView(R.layout.detailed_menu_list);    	
         
         TextView title = (TextView)findViewById(R.id.title_bar);
-        title.setText("Gun.io - Careers");
+        title.setText("Gun.io - Freelance Jobs");
         
-        ArrayList<Career> l = new ArrayList<Career>();
-        final Careers ca = new Careers();
-        Career career = ca.new Career();
-        career.setTitle("Loading..");
-        City lo = new City();
-        lo.setName("Please wait..");
-        career.setCity(lo);
-        career.setCompany_name("");
-        l.add(career);
+        ArrayList<Contract> l = new ArrayList<Contract>();
+        Contracts ca = new Contracts();
+        Contract contract = ca.new Contract();
+        contract.setTitle("Loading..");
+        contract.setValue(-1);
+        l.add(contract);
         ca.setObjects(l);
 
         //Setup the adapter views;
-        adapter = new CareersArrayListAdapter(this, R.layout.list_view_row);
-        adapter.setItems(ca.getCareers());
+        adapter = new ContractsArrayListAdapter(this, R.layout.list_view_row);
+        adapter.setItems(ca.getContracts());
         adapter.setContext(getBaseContext());
         adapter.setParent(this);
         lv = (ListView) findViewById(R.id.list);
         lv.setAdapter(adapter);
         
         //Create an AsyncTask to update that data;
-        getDataTask = new GetCareersDataTask();
+        getDataTask = new GetContractsDataTask();
         getDataTask.setContext(this);
         getDataTask.setAdapter(adapter);
         getDataTask.execute(careersURL, careersURL);
         
-        final CareersListViewActivity c = CareersListViewActivity.this;
+        final FreelanceListViewActivity c = FreelanceListViewActivity.this;
         lv.setOnItemClickListener(new OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                ArrayList<HashMap<String, String>> in = mal.get(arg2);
+                HashMap<String, String> shmap = in.get(0);
+ 
+                if(shmap.containsKey("head") && shmap.get("head").equals("true")) {
+                    //fuck
+                }
 
-                   final Intent i = new Intent(c, IndividualItemActivity.class);
-                   Career c = ca.getCareers().get(arg2);
-                   c = (Career) adapter.getCareer(arg2);
-                   
-                   if(c.getTitle().equals("Loading..")){
-                	   return;
-                   }
-                   
-                   i.putExtra("title", c.getTitle());
-                   i.putExtra("company_name", c.getCompany_name());
-                   i.putExtra("job_description", c.getJob_mkd());
-                   i.putExtra("about", c.getAbout_mkd());
-                   i.putExtra("skills", c.getSkills_mkd());
-                   startActivity(i); 
                 
             }});
         

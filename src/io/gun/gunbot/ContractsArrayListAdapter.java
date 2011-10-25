@@ -1,6 +1,6 @@
 package io.gun.gunbot;
 
-import io.gun.gunbot.Careers.Career;
+import io.gun.gunbot.Contracts.Contract;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,16 +19,16 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class CareersArrayListAdapter extends ArrayAdapter{
+public class ContractsArrayListAdapter extends ArrayAdapter{
 
-    public CareersArrayListAdapter(Context c, int i) {
+    public ContractsArrayListAdapter(Context c, int i) {
         super(c, i);
         r = c.getResources();
         rightArrow = r.getDrawable(R.drawable.rightarrow);
         smRightArrow = r.getDrawable(R.drawable.sm_rightarrow);
     }
 
-    List<Career> items;
+    List<Contract> items;
     Context c;
     Activity parentActivity;
     Resources r;
@@ -58,14 +58,14 @@ public class CareersArrayListAdapter extends ArrayAdapter{
             ll.setVisibility(View.GONE);
             return convertView;
         }
-        Career r = items.get(position);
+        Contract r = items.get(position);
         holder.text.setText(r.getTitle());
         String d;
-        if(r.getCompany_name() == ""){
-        	d= r.getCity().getName();
+        if(r.getValue() == -1){
+        	d= "Please wait..";
         }
         else{
-        	d = r.getCity().getName() + ", " + r.getCompany_name();
+        	d = "$" + r.getValue() + ". Posted by " + r.getUser().getUsername() +".";
         }
 
         if(d != null && d != "null") {
@@ -92,7 +92,7 @@ public class CareersArrayListAdapter extends ArrayAdapter{
        parentActivity = a;
    }
    
-   public void setItems(List<Career> al) {
+   public void setItems(List<Contract> al) {
        if(items == null) {
            items = al;
        }
@@ -100,7 +100,7 @@ public class CareersArrayListAdapter extends ArrayAdapter{
            items.clear();
            Iterator i = al.iterator();
            while(i.hasNext()) {
-               items.add((Career) i.next());
+               items.add((Contract) i.next());
            }
        }
    }
@@ -112,10 +112,6 @@ public class CareersArrayListAdapter extends ArrayAdapter{
 
 public int getCount() {
     return items.size();
-}
-
-public Career getCareer(int i){
-	return items.get(i);
 }
 
 public long getItemId(int position) {
