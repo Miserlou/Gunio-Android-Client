@@ -90,6 +90,9 @@ public class CareersListViewActivity extends Activity{
                    i.putExtra("job_description", c.getJob_mkd());
                    i.putExtra("about", c.getAbout_mkd());
                    i.putExtra("skills", c.getSkills_mkd());
+                   i.putExtra("apply_url", c.getHomepage());
+                   i.putExtra("id", c.getId());
+                   i.putExtra("slug", c.getSlug());
                    startActivity(i); 
                 
             }});

@@ -174,6 +174,52 @@
 		    		android:padding="9dip"
 		    		android:typeface="serif"
 		    		></TextView>
+		    		
+			   	<TextView  
+			   		android:id="@+id/apply_button"
+				    android:layout_width="wrap_content" 
+				    android:layout_height="wrap_content" 
+				    android:text="Interested? Apply for this job!"
+			        android:ellipsize="end"
+			        android:singleLine="true"
+					android:textStyle="bold"
+					android:textColor="#ffffff"
+					android:textAppearance="?android:attr/textAppearanceMedium"
+					android:paddingLeft="12dip"
+					android:paddingRight="12dip"
+					android:paddingTop="9dip"
+					android:paddingBottom="9dip"
+					android:shadowColor="#000000"
+					android:shadowRadius="1"
+					android:shadowDy="-1"
+					android:gravity="center"
+					android:layout_gravity="center"
+					android:layout_marginBottom="30dip"
+					android:background="@layout/header_bar_gradient"
+				    />
+				    
+				<TextView  
+			   		android:id="@+id/remind_button"
+				    android:layout_width="wrap_content" 
+				    android:layout_height="wrap_content" 
+				    android:text="or, send an email reminder!"
+			        android:ellipsize="end"
+			        android:singleLine="true"
+					android:textStyle="bold"
+					android:textColor="#ffffff"
+					android:textAppearance="?android:attr/textAppearanceSmall"
+					android:paddingLeft="12dip"
+					android:paddingRight="12dip"
+					android:paddingTop="9dip"
+					android:paddingBottom="9dip"
+					android:shadowColor="#000000"
+					android:shadowRadius="1"
+					android:shadowDy="-1"
+					android:gravity="center"
+					android:layout_gravity="center"
+					android:layout_marginBottom="30dip"
+					android:background="@layout/header_bar_gradient"
+				    />
 		    
 		    
 		    </LinearLayout>

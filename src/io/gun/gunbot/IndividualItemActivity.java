@@ -1,8 +1,11 @@
 package io.gun.gunbot;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +23,10 @@ public class IndividualItemActivity extends Activity {
 	ImageButton careers;
 	ImageButton contracts;
 	ImageButton opensource;
+
+	private String apply_url;
+
+	private Account[] accounts;
 	
 	
     /** Called when the activity is first created. */
@@ -38,7 +45,7 @@ public class IndividualItemActivity extends Activity {
         header.setText(title_s);
         
         TextView title2 = (TextView)findViewById(R.id.title2);
-        String title2_s = getIntent().getExtras().getString("company_name");
+        final String title2_s = getIntent().getExtras().getString("company_name");
         title2.setText(title2_s);
         
         TextView header1 = (TextView)findViewById(R.id.header1);
@@ -76,6 +83,51 @@ public class IndividualItemActivity extends Activity {
         	header3.setVisibility(View.GONE);
         	text3.setVisibility(View.GONE);
         }
+        
+        TextView apply_button = (TextView)findViewById(R.id.apply_button);
+        apply_button.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setData(Uri.parse(apply_url));
+				startActivity(i);
+				
+			}});
+        apply_url = getIntent().getExtras().getString("apply_url");
+        
+        final String id = getIntent().getExtras().getString("id");
+        final String slug = getIntent().getExtras().getString("slug");
+        accounts = AccountManager.get(this).getAccounts();
+        TextView email_button = (TextView)findViewById(R.id.remind_button);
+        email_button.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				/* Create the Intent */
+				final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+
+				/* Fill it with Data */
+				emailIntent.setType("plain/text");
+				
+				String e = "";
+				for (Account account : accounts) {
+					String possibleEmail = account.name;
+					if(possibleEmail.contains("@")) {
+						e = possibleEmail;
+						break;
+					}
+				}
+				
+				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{e});
+				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Remember to apply to " + title2_s + "!");
+				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Hey!\n\nDon't forget to apply to " + title2_s + "!\n\nhttp://gun.io/careers/" + id + "/" + slug + "\n\nLove!,\nTeam Gun.io");
+
+				/* Send it off to the Activity-Chooser */
+				startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+				
+			}});
+
         
     }
 }
