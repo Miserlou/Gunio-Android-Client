@@ -1,0 +1,6 @@
+build.xml
+*.properties
+*.class
+bin/
+gen/
+libs/*.jar
