@@ -72,12 +72,12 @@ public class CareersListViewActivity extends Activity{
         getDataTask.setAdapter(adapter);
         getDataTask.execute(careersURL, careersURL);
         
-        final CareersListViewActivity c = CareersListViewActivity.this;
+        final CareersListViewActivity context = CareersListViewActivity.this;
         lv.setOnItemClickListener(new OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 
-                   final Intent i = new Intent(c, IndividualItemActivity.class);
+                   final Intent i = new Intent(context, IndividualItemActivity.class);
                    Career c = ca.getCareers().get(arg2);
                    c = (Career) adapter.getCareer(arg2);
                    
