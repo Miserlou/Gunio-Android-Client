@@ -101,10 +101,6 @@ public class CareersListViewActivity extends Activity{
     
     public void onResume() {
         super.onResume();
-        ///XXX HACK CHANGE THIS OMG
-        if(lastTouched != null) {
-            lastTouched.setBackgroundColor(Color.WHITE);
-        }
-    }
+    }    
 
 }
