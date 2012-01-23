@@ -114,6 +114,10 @@ public int getCount() {
     return items.size();
 }
 
+public Contract getContract(int i){
+  return items.get(i);
+}
+
 public long getItemId(int position) {
     return 0;
 }

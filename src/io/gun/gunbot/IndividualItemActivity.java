@@ -7,127 +7,238 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
 import android.view.Window;
+import android.webkit.WebView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.util.Log;
+import us.feras.mdv.MarkdownView;
+import android.graphics.Color;
 
 public class IndividualItemActivity extends Activity {
-	
-	Context c;
-	
-	ImageButton careers;
-	ImageButton contracts;
-	ImageButton opensource;
 
-	private String apply_url;
+  final public static int POST_TYPE_CAREER = 0;
+  final public static int POST_TYPE_CONTRACT = 1;
+  final public static int POST_TYPE_OPEN = 2;
 
-	private Account[] accounts;
-	
-	
-    /** Called when the activity is first created. */
+  Context c;
+
+  ImageButton careers;
+  ImageButton contracts;
+  ImageButton opensource;
+
+  private String apply_url;
+
+  private Account[] accounts;
+
+  /** Called when the activity is first created. */
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    setContentView(R.layout.detailed_item);
+    
+    final Intent i = this.getIntent(); 
+    final LinearLayout llayout = (LinearLayout) findViewById(R.id.info_layout);
+
+    WebView wView;    // This is the view that the data is loaded into
+    String data = ""; // This is the container for the data
+
+    /**
+     * This code below is sloppy, but I wanted to stick
+     * with the original design of keeping a single activity to handle
+     * all the data in case there were future design ideas based around
+     * this. I also thought about moving code away from the onCreate
+     * method but I figured it would be best not to abstract this
+     * further until a final decision regarding this design is made.
+     */
+
+    final int type = i.getIntExtra("post_type", -1);
+    Log.d("gun.io","Type is: "+type);
+    if(type == POST_TYPE_CAREER) { // BEGIN CAREER LAYOUT
+      data = "##"+i.getStringExtra("title") + "\n"
+        + "###" + i.getStringExtra("company_name") + "\n"
+        + "###" + i.getStringExtra("city") + "\n"
+        + i.getStringExtra("about") + "\n"
+        + i.getStringExtra("job_description") +"\n"
+        + i.getStringExtra("skills") + "\n";
+
+      /** If the intent contains markup data */
+      /** Load the markup view */
+      if ( i.getBooleanExtra("has_markup", false) ) { 
+        // Prepare the markup view
+        MarkdownView mdv = new MarkdownView(this);
+        mdv.loadMarkDownData(data);
+        wView = mdv;
+      } else {
+        TextView title = new TextView(this);
+        TextView header = new TextView(this);
+        TextView title2 =  new TextView(this);
+        wView = new WebView(this);
+
+        title.setText(i.getStringExtra("title"));
+        title.setTextSize(22.0f);
+        title.setTextColor(Color.BLACK);
+        title.setPadding(10,0,10,10);
+        llayout.addView(title, -1, -1);
+
+        title2.setText(i.getStringExtra("company_name"));
+        title2.setTextSize(20.0f);
+        title2.setTextColor(Color.BLACK);
+        title2.setPadding(10,0,10,10);
+        llayout.addView(title2, -1, -1);
+
+        header.setText(i.getStringExtra("city"));
+        header.setTextSize(20.0f);
+        header.setTextColor(Color.BLACK);
+        header.setPadding(10,0,10,10);
+        llayout.addView(header, -1, -1);
+
+        wView.loadData(data, "text/html", "UTF-8");
+      }
+      wView.setBackgroundColor(Color.TRANSPARENT);
+      llayout.addView(wView, -1, -1);
+
+      /** Add an apply button */
+      LayoutInflater inflater = this.getLayoutInflater();
+      View apply_button= inflater.inflate(R.layout.apply_to_job, null);
+      apply_button.setOnClickListener(new ApplyButtonListener());
+      llayout.addView(apply_button, -1, -1);
+
+      accounts = AccountManager.get(this).getAccounts();
+      TextView email_button = (TextView)findViewById(R.id.remind_button);
+      email_button.setOnClickListener(new EmailButtonListener());
+    } // END CAREER LAYOUT
+    if(type == POST_TYPE_CONTRACT) { // BEGIN CONTRACT LAYOUT
+
+      data = "##"+i.getStringExtra("title") + "\n"
+        + "###$" + i.getIntExtra("value", -1) + "\n"
+        + i.getStringExtra("description") + "\n"
+        + i.getStringExtra("requirements") +"\n"
+        + i.getStringExtra("proof") + "\n";
+
+      /** If the intent contains markup data */
+      /** Load the markup view */
+      if ( i.getBooleanExtra("has_markup", false) ) { 
+        // Prepare the markup view
+        MarkdownView mdv = new MarkdownView(this);
+        mdv.loadMarkDownData(data);
+        wView = mdv;
+      } else {
+        TextView title = new TextView(this);
+        TextView header = new TextView(this);
+        TextView title2 =  new TextView(this);
+        wView = new WebView(this);
+
+        title.setText(i.getStringExtra("title"));
+        title.setTextSize(22.0f);
+        title.setTextColor(Color.BLACK);
+        title.setPadding(10,0,10,10);
+        llayout.addView(title, -1, -1);
+
+        title2.setText(i.getStringExtra("value"));
+        title2.setTextSize(20.0f);
+        title2.setTextColor(Color.BLACK);
+        title2.setPadding(10,0,10,10);
+        llayout.addView(title2, -1, -1);
+
+        wView.loadData(data, "text/html", "UTF-8");
+      }
+      wView.setBackgroundColor(Color.TRANSPARENT);
+      llayout.addView(wView, -1, -1);
+    } // END CONTRACT LAYOUT
+    if(type == POST_TYPE_OPEN) { // BEGIN OPEN LAYOUT
+      data = "##"+i.getStringExtra("title") + "\n"
+        + "###$" + i.getIntExtra("value", -1) + "\n"
+        + i.getStringExtra("description") + "\n"
+        + i.getStringExtra("requirements") +"\n"
+        + i.getStringExtra("proof") + "\n";
+
+      /** If the intent contains markup data */
+      /** Load the markup view */
+      if ( i.getBooleanExtra("has_markup", false) ) { 
+        // Prepare the markup view
+        MarkdownView mdv = new MarkdownView(this);
+        mdv.loadMarkDownData(data);
+        wView = mdv;
+      } else {
+        TextView title = new TextView(this);
+        TextView header = new TextView(this);
+        TextView title2 =  new TextView(this);
+        wView = new WebView(this);
+
+        title.setText(i.getStringExtra("title"));
+        title.setTextSize(22.0f);
+        title.setTextColor(Color.BLACK);
+        title.setPadding(10,0,10,10);
+        llayout.addView(title, -1, -1);
+
+        title2.setText(i.getStringExtra("value"));
+        title2.setTextSize(20.0f);
+        title2.setTextColor(Color.BLACK);
+        title2.setPadding(10,0,10,10);
+        llayout.addView(title2, -1, -1);
+
+        wView.loadData(data, "text/html", "UTF-8");
+      }
+      wView.setBackgroundColor(Color.TRANSPARENT);
+      llayout.addView(wView, -1, -1);
+    } // END OPEN LAYOUT
+  }
+
+  private class EmailButtonListener implements OnClickListener {
+    /* Create the Intent */
+    final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.detailed_item);
-        
-        c = this;
+    public void onClick(View v) {
+      /* Fill intent with Data */
+      emailIntent.setType("plain/text");
 
-        TextView title = (TextView)findViewById(R.id.title);
-        String title_s = getIntent().getExtras().getString("title");
-        title.setText(title_s);
-        TextView header = (TextView)findViewById(R.id.title_bar);
-        header.setText(title_s);
-        
-        TextView title2 = (TextView)findViewById(R.id.title2);
-        final String title2_s = getIntent().getExtras().getString("company_name");
-        title2.setText(title2_s);
-        
-        TextView header1 = (TextView)findViewById(R.id.header1);
-        header1.setText("Job Description");
-        TextView text1 = (TextView)findViewById(R.id.text1);
-        String text1_s = getIntent().getExtras().getString("job_description");
-        if(text1_s != null && !text1_s.equals("")){
-        	// genius. :(
-        	text1.setText(text1_s.replace("\n\n", "SQUIRTLE").replace(" *", "BULBASAUR").replace("\n", " ").replace("SQUIRTLE", "\n\n").replace("BULBASAUR", "\n*"));
+      String e = "";
+      for (Account account : accounts) {
+        String possibleEmail = account.name;
+        if(possibleEmail.contains("@")) {
+          e = possibleEmail;
+          break;
         }
-        else{
-        	header1.setVisibility(View.GONE);
-        }
-        
-        TextView header2 = (TextView)findViewById(R.id.header2);
-        header2.setText("Skill Requirements");
-        TextView text2 = (TextView)findViewById(R.id.text2);
-        String text2_s = getIntent().getExtras().getString("skills");
-        if(text2_s != null && !text2_s.equals("")){
-        	text2.setText(text2_s);
-        }
-        else{
-        	header2.setVisibility(View.GONE);
-        	text2.setVisibility(View.GONE);
-        }
-        
-        TextView header3 = (TextView)findViewById(R.id.header3);
-        header3.setText("About " + getIntent().getExtras().getString("company_name"));
-        TextView text3 = (TextView)findViewById(R.id.text3);
-        String text3_s = getIntent().getExtras().getString("about");
-        if(text3_s != null && !text3_s.equals("")){
-        	text3.setText(text3_s);
-        }
-        else{
-        	header3.setVisibility(View.GONE);
-        	text3.setVisibility(View.GONE);
-        }
-        
-        TextView apply_button = (TextView)findViewById(R.id.apply_button);
-        apply_button.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setData(Uri.parse(apply_url));
-				startActivity(i);
-				
-			}});
-        apply_url = getIntent().getExtras().getString("apply_url");
-        
-        final String id = getIntent().getExtras().getString("id");
-        final String slug = getIntent().getExtras().getString("slug");
-        accounts = AccountManager.get(this).getAccounts();
-        TextView email_button = (TextView)findViewById(R.id.remind_button);
-        email_button.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				/* Create the Intent */
-				final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-
-				/* Fill it with Data */
-				emailIntent.setType("plain/text");
-				
-				String e = "";
-				for (Account account : accounts) {
-					String possibleEmail = account.name;
-					if(possibleEmail.contains("@")) {
-						e = possibleEmail;
-						break;
-					}
-				}
-				
-				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{e});
-				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Remember to apply to " + title2_s + "!");
-				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Hey!\n\nDon't forget to apply to " + title2_s + "!\n\nhttp://gun.io/careers/" + id + "/" + slug + "\n\nLove!,\nTeam Gun.io");
-
-				/* Send it off to the Activity-Chooser */
-				startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-				
-			}});
-
-        
+      }
     }
+
+    private void sendEmail() {
+      emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{});
+
+      emailIntent.putExtra(
+          android.content.Intent.EXTRA_SUBJECT, 
+          "Remember to apply to " 
+         // + title2_s 
+          + "!");
+
+      emailIntent.putExtra(
+          android.content.Intent.EXTRA_TEXT,
+      //    "Hey!\n\nDon't forget to apply to " + title2
+      //    + "!\n\nhttp://gun.io/careers/" + id + "/" + slug 
+           "\n\nLove!,\nTeam Gun.io");
+
+      /* Send it off to the Activity-Chooser */
+      startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+    }
+  }
+
+  private class ApplyButtonListener implements OnClickListener{
+    @Override
+    public void onClick(View v) {
+      Intent i = new Intent(Intent.ACTION_VIEW);
+      i.setData(Uri.parse(apply_url));
+      startActivity(i);
+    }
+  }
 }
